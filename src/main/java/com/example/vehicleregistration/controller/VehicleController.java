@@ -1,6 +1,7 @@
 package com.example.vehicleregistration.controller;
 
 import com.example.vehicleregistration.model.Vehicle;
+import com.example.vehicleregistration.model.CarModel;
 import com.example.vehicleregistration.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -80,5 +81,39 @@ public class VehicleController {
     @GetMapping("/circulation-schedule-supabase/{placa}")
     public ResponseEntity<List<Map<String, Object>>> getCirculationScheduleFromSupabase(@PathVariable String placa) {
         return ResponseEntity.ok(vehicleService.getCirculationScheduleFromSupabase(placa));
+    }
+
+    // New CarModel endpoints
+    @GetMapping("/car-models")
+    public ResponseEntity<List<CarModel>> getAllCarModels() {
+        return ResponseEntity.ok(vehicleService.getAllCarModels());
+    }
+
+    @GetMapping("/car-models/{id}")
+    public ResponseEntity<CarModel> getCarModel(@PathVariable UUID id) {
+        return vehicleService.getCarModel(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/car-models")
+    public ResponseEntity<CarModel> createCarModel(@RequestBody CarModel carModel) {
+        return ResponseEntity.ok(vehicleService.createCarModel(carModel));
+    }
+
+    @PutMapping("/car-models/{id}")
+    public ResponseEntity<CarModel> updateCarModel(@PathVariable UUID id, @RequestBody CarModel carModel) {
+        return ResponseEntity.ok(vehicleService.updateCarModel(id, carModel));
+    }
+
+    @DeleteMapping("/car-models/{id}")
+    public ResponseEntity<Void> deleteCarModel(@PathVariable UUID id) {
+        vehicleService.deleteCarModel(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/car-models-supabase")
+    public ResponseEntity<List<Map<String, Object>>> getCarModelsFromSupabase() {
+        return ResponseEntity.ok(vehicleService.getCarModelsFromSupabase());
     }
 }

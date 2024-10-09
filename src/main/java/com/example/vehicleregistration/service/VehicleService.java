@@ -1,7 +1,9 @@
 package com.example.vehicleregistration.service;
 
 import com.example.vehicleregistration.model.Vehicle;
+import com.example.vehicleregistration.model.CarModel;
 import com.example.vehicleregistration.repository.VehicleRepository;
+import com.example.vehicleregistration.repository.CarModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -14,14 +16,17 @@ import java.util.*;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
+    private final CarModelRepository carModelRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public VehicleService(VehicleRepository vehicleRepository, JdbcTemplate jdbcTemplate) {
+    public VehicleService(VehicleRepository vehicleRepository, CarModelRepository carModelRepository, JdbcTemplate jdbcTemplate) {
         this.vehicleRepository = vehicleRepository;
+        this.carModelRepository = carModelRepository;
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // Vehicle methods
     public Vehicle createVehicle(Vehicle vehicle) {
         return vehicleRepository.save(vehicle);
     }
@@ -49,7 +54,6 @@ public class VehicleService {
     public boolean canCirculate(UUID id, LocalDate date) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found"));
-
         return canCirculateByPlaca(vehicle.getPlaca(), date);
     }
 
@@ -93,5 +97,35 @@ public class VehicleService {
     public List<Map<String, Object>> getCirculationScheduleFromSupabase(String placa) {
         String sql = "SELECT * FROM get_circulation_schedule(?)";
         return jdbcTemplate.queryForList(sql, placa);
+    }
+
+    // CarModel methods
+    public List<CarModel> getAllCarModels() {
+        return carModelRepository.findAll();
+    }
+
+    public Optional<CarModel> getCarModel(UUID id) {
+        return carModelRepository.findById(id);
+    }
+
+    public CarModel createCarModel(CarModel carModel) {
+        return carModelRepository.save(carModel);
+    }
+
+    public CarModel updateCarModel(UUID id, CarModel carModel) {
+        if (!carModelRepository.existsById(id)) {
+            throw new RuntimeException("Car model not found");
+        }
+        carModel.setId(id);
+        return carModelRepository.save(carModel);
+    }
+
+    public void deleteCarModel(UUID id) {
+        carModelRepository.deleteById(id);
+    }
+
+    public List<Map<String, Object>> getCarModelsFromSupabase() {
+        String sql = "SELECT * FROM car_models";
+        return jdbcTemplate.queryForList(sql);
     }
 }

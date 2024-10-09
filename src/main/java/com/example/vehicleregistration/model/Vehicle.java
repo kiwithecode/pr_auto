@@ -23,8 +23,9 @@ public class Vehicle {
     @Column(nullable = false)
     private String color;
 
-    @Column(nullable = false)
-    private String modelo;
+    @ManyToOne
+    @JoinColumn(name = "modelo_id")
+    private CarModel modelo;
 
     @Column(unique = true, nullable = false)
     private String chasis;
